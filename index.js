@@ -1,6 +1,6 @@
-const { getUsers, updateUser } = require("./dynamoDbHandler");
-const { getProfileTweetCount } = require("./scrapingEngine");
-const { sendEmail } = require("./SESHandler");
+const { getUsers, updateUser } = require("./modules/dynamoDbHandler");
+const { getProfileTweetCount } = require("./modules/scrapingEngine");
+const { sendEmail } = require("./modules/SESHandler");
 
 exports.handler = async (event) => {
     await main();
