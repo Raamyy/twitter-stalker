@@ -23,6 +23,13 @@ module.exports.sendEmail = async function sendEmail(metadata, emailAddresses) {
                                     ${metadata.username} have&nbsp;<b>${metadata.newTweetCount - metadata.oldTweetCount}</b> new tweets.
                                 </td>
                             </tr>
+                            ${metadata.headTweets.map(tweet => `
+                                <tr>
+                                    <td style="text-align: left;font-size: 17px;">
+                                        <b>${tweet.timeStamp}</b>: ${tweet.text}
+                                    </td>
+                                </tr>
+                            `).join("")}
                             <tr>
                                 <td style="text-align: center;font-size: 20px;">
                                     <a href="https://www.twitter.com/${metadata.username}"
