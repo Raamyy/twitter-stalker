@@ -8,16 +8,17 @@ module.exports.getUsers = function getUsers() {
     return ddb.scan(params).promise();
 }
 
-module.exports.updateUser =  async function updateUser(username, tweetCount) {
+module.exports.updateUser =  async function updateUser(username, tweetCount, latestTweetTimestamp) {
     const params = {
         TableName: 'twitter_users',
         Key: {
             username: username
         },
-        UpdateExpression: 'set tweetCount = :tweetCount, lastUpdate = :lastUpdate',
+        UpdateExpression: 'set tweetCount = :tweetCount, lastUpdate = :lastUpdate, latestTweetTimestamp = :latestTweetTimestamp',
         ExpressionAttributeValues: {
             ':tweetCount': tweetCount,
-            ':lastUpdate': new Date().toUTCString()
+            ':lastUpdate': new Date().toUTCString(),
+            ':latestTweetTimestamp': latestTweetTimestamp
         },
         ReturnValues: 'UPDATED_NEW'
     };

@@ -12,11 +12,13 @@ async function main() {
         let profileDetails = await getProfileDetails(user.username);
         let tweetCount = profileDetails.tweetCount;
         let headTweets = profileDetails.headTweets;
+        let latestTweetTimestamp = profileDetails.latestTweetTimestamp;
+
         // notify users if tweetCount has increased since last check
-        if (tweetCount > user.tweetCount) {
+        if (tweetCount > user.tweetCount || new Date(user.latestTweetTimestamp) < new Date(latestTweetTimestamp)) {
             notify(user.username, user.subscriptions, tweetCount, user.tweetCount, headTweets);
         }
-        await updateUser(user.username, tweetCount);
+        await updateUser(user.username, tweetCount, latestTweetTimestamp);
     }
 }
 

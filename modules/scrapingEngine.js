@@ -12,7 +12,8 @@ module.exports.getProfileDetails = async function getProfileDetails(username, br
 
     return {
         tweetCount: tweetsCount,
-        headTweets: tweets.slice(0, TWEET_HEAD_COUNT)
+        headTweets: tweets.slice(0, TWEET_HEAD_COUNT),
+        latestTweetTimestamp: tweets[0].timeStamp
     };
 }
 
