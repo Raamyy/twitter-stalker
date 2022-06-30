@@ -2,10 +2,11 @@ const request = require('request');
 const fs = require('fs');
 
 module.exports.getProfileDetails = async function getProfileDetails(username, browser) {
-    let twitterUser = await getTwitterUser(username);
+    let guestToken = await getGuestToken();
+    let twitterUser = await getTwitterUser(username, guestToken);
     let tweetsCount = twitterUser.data.user.result.legacy.statuses_count;
     let twitterUserId = twitterUser.data.user.result.rest_id;
-    let userTweets = await getUserTweets(twitterUserId);
+    let userTweets = await getUserTweets(twitterUserId, guestToken);
     let tweets = userTweets.data.user.result.timeline_v2.timeline.instructions[1].entries.filter(t => t.content?.itemContent?.itemType == "TimelineTweet").map(parseTweet);
 
     const TWEET_HEAD_COUNT = 5;
@@ -17,7 +18,26 @@ module.exports.getProfileDetails = async function getProfileDetails(username, br
     };
 }
 
-async function getTwitterUser(username) {
+async function getGuestToken() {
+    return new Promise((resolve, reject) => {
+
+        var options = {
+            'method': 'POST',
+            'url': 'https://api.twitter.com/1.1/guest/activate.json',
+            'headers': {
+                'authorization': 'Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA',
+                'Cookie': 'guest_id=v1%3A165662155377161377; guest_id_ads=v1%3A165662155377161377; guest_id_marketing=v1%3A165662155377161377; personalization_id="v1_6WiZRkmlthU8EID2yoPwfg=="'
+            }
+        };
+        request(options, function (error, response) {
+            if (error) reject(error);
+            else resolve(JSON.parse(response.body).guest_token);
+        });
+    });
+
+}
+
+async function getTwitterUser(username, guestToken) {
     return new Promise((resolve, reject) => {
         var options = {
             'method': 'GET',
@@ -40,7 +60,7 @@ async function getTwitterUser(username) {
                 'sec-fetch-site': 'same-origin',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
                 'x-csrf-token': '120ecbbf276e252b399ec2709827c51a',
-                'x-guest-token': '1542543535769100288',
+                'x-guest-token': guestToken,
                 'x-twitter-active-user': 'yes',
                 'x-twitter-client-language': 'en'
             }
@@ -53,8 +73,7 @@ async function getTwitterUser(username) {
 
 }
 
-
-async function getUserTweets(userId) {
+async function getUserTweets(userId, guestToken) {
     return new Promise((resolve, reject) => {
         var options = {
             'method': 'GET',
@@ -76,7 +95,7 @@ async function getUserTweets(userId) {
                 'sec-fetch-mode': 'cors',
                 'sec-fetch-site': 'same-origin',
                 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
-                'x-guest-token': '1542543535769100288',
+                'x-guest-token': guestToken,
                 'x-twitter-client-language': 'en'
             }
         };
@@ -88,7 +107,7 @@ async function getUserTweets(userId) {
 
 }
 
-function parseTweet(tweet){
+function parseTweet(tweet) {
     // console.log(tweet.content);
     let x = tweet.content.itemContent.tweet_results.result.legacy;
     return {
@@ -96,3 +115,4 @@ function parseTweet(tweet){
         timeStamp: x.created_at,
     }
 }
+

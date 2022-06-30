@@ -14,7 +14,7 @@ async function main() {
         let headTweets = profileDetails.headTweets;
         let latestTweetTimestamp = profileDetails.latestTweetTimestamp;
 
-        // notify users if tweetCount has increased since last check
+        // notify users if tweetCount has increased since last check or the latest tweet timestamp > old latest tweet timestamp
         if (tweetCount > user.tweetCount || new Date(user.latestTweetTimestamp) < new Date(latestTweetTimestamp)) {
             notify(user.username, user.subscriptions, tweetCount, user.tweetCount, headTweets);
         }
